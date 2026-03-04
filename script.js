@@ -10,14 +10,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const thumb = thumbnails[index];
         const newSrc = thumb.getAttribute('data-src');
 
-        // Add fade transition
+        // Smooth fade-out/fade-in transition
+        mainImage.style.transition = 'opacity 0.4s ease-in-out';
         mainImage.style.opacity = '0';
+
         setTimeout(() => {
             mainImage.src = newSrc;
             mainImage.style.opacity = '1';
-        }, 300);
+        }, 400);
 
-        // Update active class
+        // Update active thumbnail state
         thumbnails.forEach(t => t.classList.remove('active'));
         thumb.classList.add('active');
         currentIndex = index;
@@ -217,17 +219,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    // --- Sticky Header Functionality ---
+    const header = document.querySelector('.header');
+    let lastScrollY = window.scrollY;
+    const firstFold = 150; // Distance to scroll before sticky header triggers
+
+    window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY > firstFold) {
+            header.classList.add('header-sticky');
+            // Hide if scrolling up, show if scrolling down beyond first fold
+            if (currentScrollY < lastScrollY) {
+                header.classList.remove('sticky-visible');
+            } else {
+                header.classList.add('sticky-visible');
+            }
+        } else {
+            header.classList.remove('header-sticky', 'sticky-visible');
+        }
+        lastScrollY = currentScrollY;
+    });
+
+    // --- Image Carousel Logic ---
     const logoTrack = document.querySelector('.logo-track');
     if (logoTrack) {
+        // Optimized auto-scroll for logos
         let scrollAmount = 0;
-        const step = () => {
-            scrollAmount += 1;
+        const logoStep = () => {
+            scrollAmount += 0.5; // Smoother scroll
             if (scrollAmount >= logoTrack.scrollWidth / 2) {
                 scrollAmount = 0;
             }
             logoTrack.scrollLeft = scrollAmount;
-            requestAnimationFrame(step);
+            requestAnimationFrame(logoStep);
         };
-
+        logoStep();
     }
 });
